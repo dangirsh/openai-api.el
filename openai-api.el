@@ -7,26 +7,7 @@
 ;; Requires an OpenAI API Key
 ;; Codex models (for generating code) currently require private beta access.
 ;;
-;; This API tries to prevent unnecessarily wasteful requests. Right now, that means
-;; preventing requests that have n>1 and temperature=0.0 (multiple identical results).
-;;
-;;
-;; Configuration:
-;;
-;; See: https://beta.openai.com/account/api-keys
-;; (setq openai-api-secret-key <key>)  ; required
-;;
-;; (Optional) Engine selection
-;; See: https://beta.openai.com/docs/engines
-;; (setq openai-api-engine "davinci") ; defaults to "davinci"
-;;
-;; (Optional) Set custom completion parameters
-;; See: https://beta.openai.com/docs/api-reference/completions/create
-;;(setq openai-api-completion-params '(("max_tokens" . 128)
-;;                                     ("temperature" . 0)
-;;                                     ("frequency_penalty" . 0)
-;;                                     ("presence_penalty" . 0)))
-;;                                     ("n" . 1)))
+;; Configuration: See README.org
 
 (require 'json)
 (require 'request)

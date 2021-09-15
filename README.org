@@ -4,6 +4,8 @@ A WIP Emacs interface to OpenAI's language model REST API.
 
 This is intended to be used as a library for building interfaces to the language models.
 
+NOTE: Usage requires an OpenAI API Key. Codex models (for generating code) currently require private beta access.
+
 ** Installation
 
 [[https://github.com/jwiegley/use-package][use-package]] example:
@@ -13,7 +15,7 @@ This is intended to be used as a library for building interfaces to the language
   :straight (openai-api :type git :host github :repo "dangirsh/openai-api")
   :config
   ;; required
-  (setq openai-api-token <token>)       ; https://beta.openai.com/account/api-keys
+  (setq openai-api-secret-key <token>) ; https://beta.openai.com/account/api-keys
   ;; optional
   (setq openai-api-engine "davinci-codex") ; requires private beta access
   (setq openai-api-completion-params '((max_tokens . 100)
@@ -36,14 +38,25 @@ This is intended to be used as a library for building interfaces to the language
 Currently, there's only a basic interface that uses the active region as the prompt. Use like this:
 
 1. Set =openai-api-completion-params= as necessary
-2. In any buffer, select the text you'd like to send as a prompt
-3. Run =openai-api-complete-region= (bind to a key for convenience)
+2. In any buffer, select the text you'd like to send as a prompt.
+3. Run =openai-api-complete-region= (bind to a key for convenience).
 
 If only one completion is returned (n = 1), it is inserted below the region.
 
-If there are multiple completions returned (n > 1), they are handled via the built-in =completing-read= mechanism. I recommend trying [[https://github.com/minad/consult][consult]] for an improved =completing-read= interface, including live previews.
+If there are multiple completions returned (n > 1), the built-in =completing-read= mechanism is used. I recommend trying [[https://github.com/minad/consult][consult]] for an improved =completing-read= interface, which includes live previews.
 
-*** Programmatically: =openai-api-get-completions=
+*** Programmatically
+
+**** List all available engines: =openai-api-get-engines=
+
+#+begin_src emacs-lisp :results verbatim :exports both
+(openai-api-get-engines)
+#+end_src
+
+#+RESULTS:
+: ("ada" "babbage" "content-filter-alpha" "curie" "curie-instruct-beta" "cushman-codex" "davinci" "davinci-codex" "davinci-instruct-beta")
+
+**** Request completions for prompt: =openai-api-get-completions=
 
 #+begin_src emacs-lisp :results verbatim :exports both
 (let ((openai-api-completion-params '((max_tokens . 2)
@@ -57,11 +70,26 @@ If there are multiple completions returned (n > 1), they are handled via the bui
 #+RESULTS:
 : "4"
 
+
 ** Notes
 
 - I've only tested this on GNU Emacs 28.0.50.
+- This API tries to prevent unnecessarily wasteful requests. Right now, that means  preventing requests that have n>1 and temperature=0.0 (multiple identical results).
 
 ** Related packages
 
 - [[https://github.com/debanjum/codex-completion/][debanjum/codex-completion: Generate, Complete Code in Emacs using Op...]]
 - [[https://github.com/semiosis/pen.el/][semiosis/pen.el: pen.el is a package for prompt engineering in emacs...]]
+
+** Ideas / Future Work
+
+(some of these should go in separate libraries)
+
+- Generate prompt headers. E.g. Inject a comment with =mode-name= to indicate the language.
+- Better ways to tweak model parameters.
+  - e.g. add a prefix arg to =openai-api-complete-region= to specify number of completion results =n=.
+    - =C-u <n> openai-api-complete-region=
+  - e.g. re-run previous request, but with larger =max-token= parameter
+  -
+- Add async / streaming interface
+- Integrate with [[https://github.com/jrosdahl/fancy-dabbrev][jrosdahl/fancy-dabbrev]] for greyed-out inline completions (similar to Copilot interface)
