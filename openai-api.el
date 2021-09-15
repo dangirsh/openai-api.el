@@ -102,9 +102,10 @@
   (let ((sanitized-completion-params openai-api-completion-params))
     (if (and (equal (alist-get 'temperature openai-api-completion-params) 0.0)
              (> (alist-get 'n openai-api-completion-params) 1))
-        (display-warning 'openai-api
-                         "OpenAI API: Requesting multiple responses (n>1) with temperature=0.0 is useless, setting n=1.")
-      (setf (alist-get 'n sanitized-completion-params) 1))
+        (progn
+          (display-warning 'openai-api
+                           "OpenAI API: Requesting multiple responses (n>1) with temperature=0.0 is useless, setting n=1.")
+          (setf (alist-get 'n sanitized-completion-params) 1)))
     sanitized-completion-params))
 
 
@@ -129,15 +130,35 @@
   (openai-api--parse-completion-response
    (openai-api--completion-request prompt)))
 
-(defun openai-api-complete-region (&optional b e)
-  "Get a completion for the current region."
-  (interactive "r")
-  (let* ((prompt (buffer-substring-no-properties (region-beginning) (region-end)))
-         (completions (openai-api-get-completions prompt)))
+(defun openai-api--completions-for-region ()
+  "Get the completions for the current region."
+  (openai-api-get-completions
+   (buffer-substring-no-properties (region-beginning) (region-end))))
+
+(defun openai-api-complete-region ()
+  (interactive)
+  (let ((completions (openai-api--completions-for-region)))
+    (goto-char (region-end))
     (deactivate-mark)
-    (goto-char e)
-    (newline)
-    (insert (completing-read "Choose completion:" completions))))
+    (newline-and-indent)
+    (if (equal (length completions) 1)
+        (insert (car completions))
+      (insert (completing-read "Completion:" completions)))))
+
+(defun openai-api-consult-complete-region ()
+  (interactive)
+  (require 'consult)
+  (let ((completions (openai-api--completions-for-region)))
+    (goto-char (region-end))
+    (deactivate-mark)
+    (newline-and-indent)
+    (if (equal (length completions) 1)
+        (insert (car completions))
+      (let ((kill-ring))
+        (dolist (completion (reverse completions))
+          (kill-new completion))
+        (consult-yank-pop)))))
+
 
 (provide 'openai-api)
 
