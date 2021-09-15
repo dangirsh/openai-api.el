@@ -31,7 +31,7 @@ This is intended to be used as a library for building interfaces to the language
 
 ** Example Usage
 
-#+begin_src emacs-lisp :results verbatim :export both
+#+begin_src emacs-lisp :results verbatim :exports both
 (let ((openai-api-completion-params '((max_tokens . 2)
                                        (temperature . 0.0)
                                        (frequency_penalty . 0)
