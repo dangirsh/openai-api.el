@@ -17,7 +17,7 @@ NOTE: Usage requires an OpenAI API Key. Codex models (for generating code) curre
   ;; required
   (setq openai-api-secret-key <token>) ; https://beta.openai.com/account/api-keys
   ;; optional
-  (setq openai-api-engine "davinci-codex") ; requires private beta access
+  (setq openai-api-engine "davinci-codex") ; *-codex models require private beta access
   (setq openai-api-completion-params '((max_tokens . 100)
                                        (temperature . 0.0)
                                        (frequency_penalty . 0)
@@ -93,3 +93,5 @@ If there are multiple completions returned (n > 1), the built-in =completing-rea
   -
 - Add async / streaming interface
 - Integrate with [[https://github.com/jrosdahl/fancy-dabbrev][jrosdahl/fancy-dabbrev]] for greyed-out inline completions (similar to Copilot interface)
+- Allow specification of unit tests for generated function
+  + filter results based on test results
