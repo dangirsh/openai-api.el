@@ -12,7 +12,7 @@ NOTE: Usage requires an OpenAI API Key. Codex models (for generating code) curre
 
 #+begin_src emacs-lisp
 (use-package openai-api
-  :straight (openai-api :type git :host github :repo "dangirsh/openai-api")
+  :straight (openai-api :type git :host github :repo "dangirsh/openai-api.el")
   :config
   ;; required
   (setq openai-api-secret-key <token>) ; https://beta.openai.com/account/api-keys
